@@ -1,0 +1,15 @@
+<!-- delete_address.html -->
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h2>Delete Address</h2>
+        <p>Are you sure you want to delete the address?</p>
+        <p>{{ address.street_address }}, {{ address.city }}, {{ address.state }}, {{ address.country }} - {{ address.postal_code }}</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            <a href="{% url 'manage_address' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="tm-block-title">Product Variants</h2>
+    <div class="row tm-content-row">
+        <div class="col-sm-12 col-md-12 col-lg-12 tm-block-col">
+            <div class="tm-bg-primary-dark tm-block tm-block-products">
+                <div class="tm-product-table-container">
+                    <table class="table table-hover tm-table-small tm-product-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">PRODUCT TITLE</th>
+                                <th scope="col">SIZE</th>
+                                <th scope="col">COLOR</th>
+                                <th scope="col">STOCK</th>
+                                <th scope="col">PRICE</th>
+                                <th scope="col">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for variant in variants %}
+                            <tr>
+                                <td class="tm-product-name">{{ variant.product.title }}</td>
+                                <td>{{ variant.size.size_name }}</td>
+                                <td>{{ variant.color.color_name }}</td>
+                                <td>{{ variant.quantity }}</td>
+                                <td>{{ variant.price }}</td>
+                                <td>
+                                    <a href="{% url 'product_page:edit_product_variant' variant.pk %}" class="btn btn-primary">Edit</a>
+                                    <a href="{% url 'product_page:delete_product_variant' variant.pk %}" class="btn btn-danger">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- table container -->
+                <a href="{% url 'product_page:add_product_variant' %}?product_id={{ product.id }}" class="btn btn-primary btn-block text-uppercase mb-3">Add New Variant</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

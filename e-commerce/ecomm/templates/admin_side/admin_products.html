@@ -1,0 +1,127 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row tm-content-row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 tm-block-col">
+            <div class="tm-bg-primary-dark tm-block tm-block-products">
+                <div class="tm-product-table-container">
+                    <form method="get" action="{% url 'admin_products' %}">
+                        <div class="form-group ">
+                            <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ search_query }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-3">Search</button>
+                    </form>
+                    <h2 class="tm-block-title">Product List</h2>
+                    <table class="table table-hover tm-table-small tm-product-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">PRODUCT TITLE</th>
+                                <th scope="col">ORIGINAL PRICE</th>
+                                <th scope="col">OFFER</th> 
+                                <th scope="col">CATEGORY</th>
+                                <th scope="col">BRAND</th>
+                                <th scope="col">ACTIONS</th>
+                                <th scope="col">AVAILABILITY</th>
+                                <th scope="col">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in page_obj %}
+                            <tr>
+                                <td class="tm-product-name">{{ product.title }}</td>
+                                <td>{{ product.original_price }}</td>
+                                <td>{{ product.product_offer }}%</td> 
+                                <td>{{ product.category }}</td>
+                                <td>{{ product.brand }}</td>
+                                <td>
+                                    <a href="{% url 'edit_product' product.pk %}" class="btn btn-primary">
+                                        Edit
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if product.availability_status == 'in_stock' %}
+                                        <span class="text-success">In Stock</span>
+                                    {% else %}
+                                        <span class="text-danger">Out of Stock</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a class="text-warning" href="{% url 'delete_product' product.pk %}">
+                                        Change Availability
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- table container -->
+                <a href="{% url 'add_product' %}" class="btn btn-primary btn-block text-uppercase mb-3">Add new product</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% for i in page_obj.paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row tm-content-row">
+        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
+            <div class="">
+                <h2 class="tm-block-title">Product Categories</h2>
+                <a href="{% url 'product_categories' %}" class="btn btn-primary btn-block text-uppercase mb-3">Manage Categories</a>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
+            <div class="">
+                <h2 class="tm-block-title">Product Brands</h2>
+                <a href="{% url 'product_brands' %}" class="btn btn-primary btn-block text-uppercase mb-3">Manage Brands</a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="d-flex justify-content-between mb-4">
+                <a href="{% url 'my_orders' %}" class="btn btn-secondary">View Your Orders</a>
+                <a href="{% url 'product_page:shop' %}" class="btn btn-secondary">Back to Shop</a>
+            </div>
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="h5 mb-0">Order Failed</h4>
+                </div>
+                
+                <div class="card-body">
+                    <h3 class="text-danger">We're sorry, but your payment could not be processed.</h3>
+                    <p class="mb-0">Please try again later or contact support if you need assistance.</p>
+                    <p class="mb-0">If you believe this is an error, please reach out to our support team.</p>
+                    
+                    <!-- Optionally, you could include a form or contact information here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

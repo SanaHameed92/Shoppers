@@ -1,0 +1,57 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+
+<div class="container mt-5">
+    <div class="row tm-content-row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 tm-block-col">
+            <div class="tm-bg-primary-dark tm-block tm-block-product-subcategories ">
+                <h2 class="tm-block-title">Manage Subcategories for {{ category.category_name }}</h2>
+                <div class="text-center mb-3">
+                    <!-- Back to Category Button -->
+                    <a href="{% url 'product_categories' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Categories
+                    </a>
+                </div>
+                <div class="tm-product-table-container">
+                    <table class="table tm-table-small tm-product-table text-white">
+                        <thead>
+                            <tr>
+                                <th>Subcategory Name</th>
+                              
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subcategory in subcategories %}
+                            <tr>
+                                <td>{{ subcategory.subcategory_name }}</td>
+                               
+                                <td>
+                                    <a href="{% url 'edit_subcategory' subcategory.pk %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'delete_subcategory' subcategory.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <form method="post" class="text-center text-white pt-2">
+                        {% csrf_token %}
+                        {{ subcategory_form.as_p }}
+                        <button type="submit" class="btn btn-primary btn-block text-uppercase mb-3">Add new subcategory</button>
+                    </form>
+                </div>
+                <!-- table container -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

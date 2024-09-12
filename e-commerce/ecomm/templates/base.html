@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Shoppers &mdash; Colorlib e-Commerce Template</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700"> 
+    <link rel="stylesheet" href="{%static 'fonts/icomoon/style.css'%}">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css'%}">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css'%}">
+    <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css'%}">
+
+
+    <link rel="stylesheet" href="{% static 'css/aos.css'%}">
+
+    <link rel="stylesheet" href="{% static 'css/style.css'%}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Elevate Zoom -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+    <!-- Owl Carousel CSS -->
+    
+    {% block head %}
+    <!-- Owl Carousel CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+    {% endblock %}
+    {% block scripts %}
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Owl Carousel JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <!-- Elevate Zoom JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+   
+
+    {% endblock%}
+
+
+
+
+    <style>
+     
+      .rating {
+          display: flex;
+          justify-content: center; 
+      }
+      .rating .fa {
+          color: #FFD700; /* Gold color for stars */
+          margin-right: 5px;
+      } 
+      .rating1 {
+        display: flex;
+        
+    }
+    .rating1 .fa {
+        color: #FFD700; /* Gold color for stars */
+        margin-right: 5px;
+    }
+    /* styles.css or within a <style> tag in your base template */
+      .product-image {
+          width: 100%;
+          height: 300px; /* Adjust the height as necessary */
+          object-fit: contain;
+      }
+      .product-image1 {
+        width: 100%;
+        height: 400px; /* Adjust the height as necessary */
+        object-fit: contain;
+    }
+
+    
+      
+
+  </style>
+  </head>
+  
+ 
+    
+  {% include "includes/navbar.html" %}
+  
+ <!--navbar-->
+
+    {% block content%}
+    <!--content-->
+
+    {% endblock%}
+
+
+    <!-- footer-->
+
+    {% include "includes/footer.html" %}
+    <!-- jQuery -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- jQuery UI -->
+     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    
+    <script src="{% static 'js/aos.js' %}"></script>
+
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script src="{% static 'js/checkout.js' %}"></script>
+
+    
+</html>

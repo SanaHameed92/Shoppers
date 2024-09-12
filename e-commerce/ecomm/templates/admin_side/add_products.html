@@ -1,0 +1,116 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="container tm-mt-big tm-mb-big">
+    <div class="row">
+        <div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
+            <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="tm-block-title d-inline-block">Add New Product</h2>
+                    </div>
+                </div>
+                <div class="tm-edit-product-row">
+                    <div class="col-xl-6 col-lg-6 col-md-12">
+                        <form id="product-form" action="{% url 'add_product' %}" method="post" class="tm-edit-product-form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            {{ product_form.as_p }}
+
+                            <div class="form-group">
+                                <label for="id_product_image">Main Image</label>
+                                <input type="file" name="product_image" id="product_image">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_additional_images">Additional Images</label>
+                                <input type="file" name="additional_images" multiple>
+                            </div>
+
+
+                            <div class="form-group">
+                                <img id="image-preview" style="display:none; max-width: 100%;">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block text-uppercase">Add Product</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Cropper.js -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<script>
+    let cropper;
+    let cropperId;
+
+    // Handle cropping for main image
+    document.getElementById('product_image').addEventListener('change', function(event) {
+        let files = event.target.files;
+        if (files && files.length > 0) {
+            let file = files[0];
+            let url = URL.createObjectURL(file);
+            document.getElementById('image-preview').src = url;
+            document.getElementById('image-preview').style.display = 'block';
+            cropper = new Cropper(document.getElementById('image-preview'), {
+                aspectRatio: 1,
+                viewMode: 3,
+                preview: '.preview'
+            });
+        }
+    });
+
+    // Handle cropping for additional images
+    function handleAdditionalImageCrop(imageInputId, previewId) {
+        document.getElementById(imageInputId).addEventListener('change', function(event) {
+            let files = event.target.files;
+            if (files && files.length > 0) {
+                let file = files[0];
+                let url = URL.createObjectURL(file);
+                document.getElementById(previewId).src = url;
+                document.getElementById(previewId).style.display = 'block';
+                cropper = new Cropper(document.getElementById(previewId), {
+                    aspectRatio: 1,
+                    viewMode: 3,
+                    preview: '.preview'
+                });
+                cropperId = previewId;
+            }
+        });
+    }
+
+    handleAdditionalImageCrop('additional_image_0', 'additional_image_preview_0');
+    handleAdditionalImageCrop('additional_image_1', 'additional_image_preview_1');
+    // Add more handlers if needed
+
+    document.getElementById('crop-upload-button').addEventListener('click', function(event) {
+        let form = document.getElementById('product-form');
+        let formData = new FormData(form);
+
+        if (cropper) {
+            cropper.getCroppedCanvas().toBlob(function (blob) {
+                formData.append('cropped_image', blob);
+                fetch(form.action, {
+                    method: form.method,
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        console.error(data.error);
+                    }
+                })
+                .catch(error => console.error(error));
+            });
+        } else {
+            form.submit();
+        }
+    });
+</script>
+{% endblock %}

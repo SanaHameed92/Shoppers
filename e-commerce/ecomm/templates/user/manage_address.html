@@ -1,0 +1,54 @@
+{% extends "user_base.html" %}
+{% load static %}
+
+{% block user_content %}
+<style>
+    /* Custom CSS styles for manage address page */
+    .profile-content {
+        margin-top: 20px;
+    }
+
+    .btn-add-address {
+        margin-bottom: 10px;
+    }
+
+    .address-list {
+        margin-top: 10px;
+    }
+
+    .address-item {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="profile-content">
+    <div class="address-section">
+        <a href="{% url 'add_address' %}?redirect_to=manage_address" class="btn btn-primary mb-3">Add New Address</a>
+
+        <!-- Display Already Added Addresses -->
+        <div class="address-list">
+            {% if addresses %}
+                {% for address in addresses %}
+                <div class="address-item">
+                    <h5>{{ address.first_name }} {{ address.last_name }}</h5>
+                    <p>{{ address.street_address }}, {{ address.city }}, {{ address.state }}, {{ address.country }} - {{ address.postal_code }}</p>
+                    
+                    {% if address.is_default %}
+                        <span class="badge badge-primary">Default</span>
+                    {% endif %}
+                    <div class="mt-2 text-right">
+                        <a href="{% url 'edit_address' address.id %}" class="btn btn-sm btn-outline-primary mr-2">Edit</a>
+                        <a href="{% url 'delete_address' address.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No addresses added yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

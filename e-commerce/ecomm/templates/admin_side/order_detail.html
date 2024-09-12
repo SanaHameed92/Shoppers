@@ -1,0 +1,179 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Order Detail - Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'admin/css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/templatemo-style.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/custom.css' %}"> <!-- Custom styles for this page -->
+    <style>
+        .order-detail {
+            margin-top: 20px;
+        }
+
+        .order-detail table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-detail th, .order-detail td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+        }
+
+        .order-detail th {
+            background-color: ;
+            font-weight: bold;
+        }
+
+        .order-detail tr:nth-child(even) {
+            background-color:;
+        }
+
+        .status-pending {
+            color: #6c757d; /* Gray */
+            font-weight: bold;
+        }
+
+        .status-completed {
+            color: #28a745; /* Green */
+            font-weight: bold;
+        }
+
+        .status-failed {
+            color: #dc3545; /* Red */
+            font-weight: bold;
+        }
+
+        .status-ordered {
+            color: #007bff; /* Blue */
+            font-weight: bold;
+        }
+
+        .status-shipped {
+            color: #17a2b8; /* Teal */
+            font-weight: bold;
+        }
+
+        .status-delivered {
+            color: #ffc107; /* Yellow */
+            font-weight: bold;
+        }
+
+        .status-cancelled {
+            color: #dc3545; /* Red */
+            font-weight: bold;
+        }
+    </style>
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="my-4">
+            <a href="{% url 'order_list' %}" class="btn btn-secondary btn-lg">Back to Order List</a>
+        </div>
+        <h1 class="my-4">Order Detail - Order #{{ order.order_number }}</h1>
+        
+        <table class="table table-bordered order-detail">
+            <tbody>
+                <tr>
+                    <th>Order Number</th>
+                    <td>{{ order.order_number }}</td>
+                </tr>
+                <tr>
+                    <th>Customer</th>
+                    <td>{{ order.user.first_name }}</td>
+                </tr>
+                <tr>
+                    <th>Payment Method</th>
+                    <td>{{ order.payment_method }}</td>
+                </tr>
+                <tr>
+                    <th>Payment Status</th>
+                    <td>
+                        {% if order.payment_status == 'Pending' %}
+                            <span class="status-pending">{{ order.payment_status }}</span>
+                        {% elif order.payment_status == 'Completed' %}
+                            <span class="status-completed">{{ order.payment_status }}</span>
+                        {% elif order.payment_status == 'Failed' %}
+                            <span class="status-failed">{{ order.payment_status }}</span>
+                        {% else %}
+                            {{ order.payment_status }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Delivery Address</th>
+                    <td>{{ order.address }}</td>
+                </tr>
+                <tr>
+                    <th>Delivery Charge</th>
+                    <td>${{ order.shipping_fee }}</td>
+                </tr>
+                <tr>
+                    <th>Total</th>
+                    <td>${{ order.grand_total }}</td>
+                </tr>
+                <tr>
+                    <th>Order Status</th>
+                    <td>
+                        {% if order.status == 'Ordered' %}
+                            <span class="status-ordered">{{ order.status }}</span>
+                        {% elif order.status == 'Shipped' %}
+                            <span class="status-shipped">{{ order.status }}</span>
+                        {% elif order.status == 'Delivered' %}
+                            <span class="status-delivered">{{ order.status }}</span>
+                        {% elif order.status == 'Cancelled' %}
+                            <span class="status-cancelled">{{ order.status }}</span>
+                        {% else %}
+                            {{ order.status }}
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        {% if cancellation_request %}
+        <div class="container mt-4">
+            <h3>Cancellation Request Details</h3>
+            <p><strong>Order Number:</strong> {{ cancellation_request.order.order_number }}</p>
+            <p><strong>Requested At:</strong> {{ cancellation_request.requested_at|date:"Y-m-d H:i" }}</p>
+            <p><strong>Status:</strong> {{ cancellation_request.status }}</p>
+            <p><strong>Admin Comment:</strong> {{ cancellation_request.admin_comment }}</p>
+            <p><strong>Reason for Cancellation:</strong> {{ cancellation_request.reason }}</p>
+            
+            {% if cancellation_request.status == 'Pending' %}
+            <a href="{% url 'process_cancellation_request' request_id=cancellation_request.id action='approve' %}" class="btn btn-success">Approve</a>
+            <a href="{% url 'process_cancellation_request' request_id=cancellation_request.id action='reject' %}" class="btn btn-danger">Reject</a>
+            {% endif %}
+            </div>
+        {% endif %}
+
+        {% if return_request %}
+    <div class="container mt-4">
+        <h3>Return Request Details</h3>
+        <p><strong>Order Number:</strong> {{ return_request.order.order_number }}</p>
+        <p><strong>Requested At:</strong> {{ return_request.created_at|date:"Y-m-d H:i" }}</p>
+        <p><strong>Status:</strong> {{ return_request.get_status_display }}</p>
+        <p><strong>Reason for Return:</strong> {{ return_request.reason }}</p>
+        
+        {% if return_request.status == 'Requested' %}
+        <a href="{% url 'admin_confirm_return' return_request_id=return_request.id %}" class="btn btn-success">Confirm</a>
+        <a href="{% url 'admin_reject_return' return_request_id=return_request.id %}" class="btn btn-danger">Reject</a>
+        {% endif %}
+    </div>
+{% endif %}
+        
+        
+    </div>
+</body>
+</html>
+{% endblock %}

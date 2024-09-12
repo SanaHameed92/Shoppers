@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Inline CSS for Messages -->
+<style>
+    .alert-container {
+        margin: 20px 0;
+    }
+    .alert {
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+    }
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border-color: #ffeeba;
+    }
+    .alert-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border-color: #bee5eb;
+    }
+</style>
+
+<div class="bg-light py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-0">
+                <a href="{% url 'main_page:index' %}">Home</a> <span class="mx-2 mb-0">/</span>
+                <a href="{% url 'product_page:shop' %}">Shop</a> <span class="mx-2 mb-0">/</span>
+                <strong class="text-black">Cart</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="site-section">
+    <div class="container">
+        {% if cart_items %}
+        <div class="row mb-5">
+            <form id="cart-form">
+                {% csrf_token %}
+                <div class="site-blocks-table">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="product-thumbnail">Image</th>
+                                <th class="product-name">Product</th>
+                                <th class="product-size">Size</th>
+                                <th class="product-color">Color</th>
+                                <th class="product-original-price">Original Price</th>
+                                <th class="product-offer">Discount</th>
+                                <th class="product-offer">Best Offer</th>
+                                <th class="product-quantity">Quantity</th>
+                                <th class="product-total">Total</th>
+                                <th class="product-remove">Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td class="product-thumbnail">
+                                    <img src="{{ item.product.product_image.url }}" alt="{{ item.product.title }}" class="img-fluid">
+                                </td>
+                                <td class="product-name">
+                                    <a href="{% url 'product_page:shop-single' item.product.id %}">
+                                        <h2 class="h5 text-black">{{ item.product.title }}</h2>
+                                    </a>
+                                </td>
+                                <td class="product-size">{{ item.size }}</td>
+                                <td class="product-color">{{ item.color }}</td>
+                                <td class="product-original-price">${{ item.product.original_price|floatformat:2 }}</td>
+                                <td class="product-offer">
+                                    {% if item.product.get_best_offer %}
+                                        <span class="text-success">Best Offer: {{ item.product.get_best_offer }}%</span>
+                                    {% else %}
+                                        <span class="text-muted">No Offer</span>
+                                    {% endif %}
+                                </td>
+                                
+                                <td class="product-offer">${{ item.product.offer_price|floatformat:2 }}</td>
+                                <td>
+                                    <div class="input-group mb-3" style="max-width: 120px;">
+                                        <input type="number" class="form-control quantity-input" data-item-id="{{ item.id }}" value="{{ item.quantity }}" min="1">
+                                    </div>
+                                </td>
+                                <td>${{ item.total_price|floatformat:2 }}</td>
+                                
+                                <td>
+                                    <a href="{% url 'product_page:remove_from_cart' item.id %}" class="btn btn-primary btn-sm">X</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row mb-5">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <p><a href="{% url 'product_page:shop' %}" class="buy-now btn btn-sm btn-primary">Continue Shopping</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 pl-5">
+                <div class="row justify-content-end">
+                    <div class="col-md-7">
+                        <div class="row">
+                            <div class="col-md-12 text-right border-bottom mb-5">
+                                <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <span class="text-black">Subtotal</span>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <strong class="text-black">${{ total|floatformat:2 }}</strong>
+                            </div>
+                        </div>
+                        <div class="row mb-5">
+                            <div class="col-md-6">
+                                <span class="text-black">Total</span>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <strong class="text-black">${{ total|floatformat:2 }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="{% url 'product_page:checkout' %}" class="btn btn-primary btn-lg py-3 btn-block">Proceed To Checkout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2>Your cart is empty.</h2>
+                <p><a href="{% url 'product_page:shop' %}" class="btn btn-primary">Continue Shopping</a></p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- JavaScript for AJAX -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        var previousValue; // Variable to store the previous valid value
+
+        // Capture the previous valid value on focus
+        $('.quantity-input').on('focus', function() {
+            previousValue = $(this).val();
+        });
+
+        // Handle quantity change
+        $('.quantity-input').on('change', function() {
+            var $this = $(this);
+            var itemId = $this.data('item-id');
+            var quantity = $this.val();
+
+            $.ajax({
+                url: '{% url "product_page:update_cart" %}',
+                type: 'POST',
+                data: {
+                    'quantity': quantity,
+                    'item_id': itemId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();  // Reload the page to see updated cart
+                    } else {
+                        alert(response.error_message);
+                        $this.val(previousValue); // Reset the input to the previous valid value
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error:', xhr.responseText);
+                    $this.val(previousValue); // Reset the input to the previous valid value
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

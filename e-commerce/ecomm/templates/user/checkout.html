@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-light py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-0">
+                <a href="{% url 'main_page:index' %}">Home</a> <span class="mx-2 mb-0">/</span>
+                <a href="{% url 'product_page:cart' %}">Cart</a> <span class="mx-2 mb-0">/</span>
+                <strong class="text-black">Checkout</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="site-section">
+    <div class="container">
+        <!-- Add Back to Cart Button and Add New Address Button -->
+        <div class="row mb-3">
+            <div class="col-md-12 text-center">
+                <a href="{% url 'product_page:cart' %}" class="btn btn-secondary py-2">Back to Cart</a>
+                <a href="{% url 'add_address' %}?redirect_to=product_page:checkout" class="btn btn-primary py-2 ml-2">Add New Address</a>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'product_page:checkout' %}" id="checkout-form">
+            {% csrf_token %}
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h2 class="text-black h4">Shipping Address</h2>
+                    <div class="form-group">
+                        <label for="selected_address">Select Address <span class="text-danger">*</span></label>
+                        <select id="selected_address" name="selected_address" class="form-control" required>
+                            <option value="" disabled selected>Select an address</option>
+                            {% for address in addresses %}
+                                <option value="{{ address.id }}" {% if address.id == selected_address.id %}selected{% endif %}>
+                                    {{ address.first_name }} {{ address.last_name }}, {{ address.street_address }}, {{ address.city }}, {{ address.state }}, {{ address.country }}, {{ address.postal_code }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <h2 class="text-black h4">Payment Method</h2>
+                        <div class="form-group">
+                            <label>Select Payment Method <span class="text-danger">*</span></label>
+                            <div>
+                                <input type="radio" id="razorpay" name="payment_method" value="RazorPay" class="mr-2" onclick="togglePaymentButton('razorpay')" required>
+                                <label for="razorpay">RazorPay</label>
+                            </div>
+                            <div>
+                                <input type="radio" id="cod" name="payment_method" value="COD" class="mr-2" onclick="togglePaymentButton('cod')" required>
+                                <label for="cod">Cash on Delivery</label>
+                                <span class="text-muted" style="margin-left: 8px;"><small>-Applicable for orders Rs 1000 or less.</small></span>
+                            </div>
+                            <div>
+                                <input type="radio" id="wallet" name="payment_method" value="Wallet" class="mr-2" onclick="togglePaymentButton('wallet')" required>
+                                <label for="wallet">Wallet</label>
+                                <span class="text-muted" style="margin-left: 8px;"><small>-Your current balance: Rs {{ user.wallet }}</small></span>
+                            </div>
+                        </div>
+                </div>
+
+                <!-- Coupon Code Section -->
+                 <div class = 'row '>
+                    <div class="col-md-8 mb-5">
+                        <h2 class="text-black h4">Coupon Code</h2>
+                        <div class="form-group">
+                            <label for="coupon_code">Enter your coupon code</label>
+                            <div class="input-group">
+                                <input type="text" id="coupon_code" name="coupon_code" class="form-control" placeholder="Enter coupon code">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-primary" onclick="applyCoupon()">Apply Coupon</button>
+                                    <button type="button" class="btn btn-danger ml-2" onclick="removeCoupon()">Remove Coupon</button>
+                                </div>
+                            </div>
+                            <p id="coupon_message" class="text-danger mt-2"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h2 class="text-black h4">Available Coupons</h2>
+                        <div class="form-group">
+                            <label for="couponDropdown">Here's a list of available coupons</label>
+                            <select id="couponDropdown" name="coupon_code" class="form-control">
+                                <option value="{{ coupon.code }}" disabled selected>YOUR COUPONS</option>
+                                {% for coupon in coupons %}
+                                <option value="{{ coupon.code }}">
+                                    {{ coupon.code }} - {{ coupon.name }} ({{ coupon.discount }}% off, Valid From: {{ coupon.valid_from }}, Valid To: {{ coupon.valid_to }})
+                                </option>
+                                {% empty %}
+                                <option value="" disabled>No coupons available</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referral Code Section -->
+              
+                <div class="col-md-12">
+                    <h2 class="text-black h4">Order Summary</h2>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="product-name">Product</th>
+                                <th class="product-price">Price</th>
+                                <th class="product-quantity">Quantity</th>
+                                <th class="product-total">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td class="product-name">
+                                    <h2 class="h5 text-black">{{ item.product.title }}</h2>
+                                </td>
+                                <td>${{ item.product.offer_price|floatformat:2 }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ item.total_price|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <span class="text-black">Subtotal</span>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <strong class="text-black">$
+                                <span id="subtotal">{{ total|floatformat:2 }}</span>
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <span class="text-black">Shipping Fee</span>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <strong class="text-black">$
+                                <span id="shipping_fee">{{ shipping_fee }}</span>
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <span class="text-black">Discount</span>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <strong class="text-black">
+                                <span id="discount_amount">0.00%</span>
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <span class="text-black">Total</span>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <strong class="text-black grand-total">
+                                <span id="grand_total">{{ grand_total|floatformat:2 }}</span>
+                            </strong>
+                        </div>
+                    </div>
+                   
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <span class="text-black">Estimated Delivery Date</span>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <strong class="text-black">{{ formatted_delivery_date }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-primary btn py-3 payment-button" id="payWithCOD" style="display: none;">Place Order with COD</button>
+                    <button type="button" class="btn btn-primary payWithRazorpay btn py-3 payment-button" id="payWithRazorpay" style="display: none;">Place Order with RazorPay</button>
+                    <button type="button" class="btn btn-primary btn py-3 payment-button" id="payWithWallet" style="display: none;">Place Order with Wallet</button>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function togglePaymentButton(paymentMethod) {
+        document.querySelectorAll('.payment-button').forEach(function(button) {
+            button.style.display = 'none';
+        });
+        if (paymentMethod === 'razorpay') {
+            document.getElementById('payWithRazorpay').style.display = 'inline-block';
+        } else if (paymentMethod === 'cod') {
+            document.getElementById('payWithCOD').style.display = 'inline-block';
+        }else if (paymentMethod === 'wallet') {
+            document.getElementById('payWithWallet').style.display = 'inline-block';
+        }
+    }
+
+    document.getElementById('payWithCOD').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent form submission initially
+        var grandTotal = parseFloat(document.getElementById('grand_total').textContent.replace('$', ''));
+        if (grandTotal > 1000) {
+            alert("Orders above Rs 1000 are not allowed for Cash on Delivery. Please choose a different payment method.");
+        } else {
+            document.getElementById('checkout-form').submit(); // Submit the form manually
+        }
+    });
+
+    document.getElementById('payWithRazorpay').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent form submission initially
+        // Add your RazorPay payment integration code here
+        document.getElementById('checkout-form').submit(); // Submit the form manually
+    });
+
+    document.getElementById('payWithWallet').addEventListener('click', function(event) {
+        event.preventDefault();
+        // Add any wallet-specific logic here if needed
+        document.getElementById('checkout-form').submit();
+    });
+
+    function applyCoupon() {
+        var couponCode = document.getElementById('coupon_code').value;
+        var csrfToken = '{{ csrf_token }}';
+        $.ajax({
+            type: 'POST',
+            url: '{% url "product_page:checkout" %}',
+            data: {
+                'coupon_code': couponCode,
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                console.log("Response:", response);
+    
+                if (response.success) {
+                    $('#coupon_message').text(response.message);
+    
+                    var newTotal = parseFloat(response.new_total);
+                    var discount = parseFloat(response.discount);
+    
+                    $('#grand_total').text('$' + newTotal.toFixed(2));
+                    $('#applied_coupon').text(response.applied_coupon_code ? 'Coupon Code: ' + response.applied_coupon_code : '');
+                    $('#discount_amount').text(discount ? 'Discount Applied: ' + discount.toFixed(2) + '%' : 'Discount Applied: 0%');
+                } else {
+                    $('#coupon_message').text(response.message);
+                    $('#discount_amount').text('Discount Applied: 0%');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                $('#coupon_message').text("An error occurred. Please try again.");
+                $('#discount_amount').text('Discount Applied: 0%');
+            }
+        });
+    }
+
+    function removeCoupon() {
+        var csrfToken = '{{ csrf_token }}';
+        $.ajax({
+            type: 'POST',
+            url: '{% url "product_page:checkout" %}',
+            data: {
+                'remove_coupon': 'true',
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                console.log("Response:", response);
+    
+                if (response.success) {
+                    $('#coupon_message').text(response.message);
+                    $('#discount_amount').text('Discount Applied: $0.00');
+                    $('#grand_total').text('$' + parseFloat(response.new_total).toFixed(2));
+                } else {
+                    $('#coupon_message').text(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                $('#coupon_message').text("An error occurred. Please try again.");
+                $('#discount_amount').text('Discount Applied: $0.00');
+            }
+        });
+    }
+
+   
+</script>
+    
+
+{% endblock %}

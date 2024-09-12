@@ -1,0 +1,87 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<!-- admin_side/templates/admin_side/edit_product.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include any additional CSS files or stylesheets -->
+    <style>
+        /* Custom styles for form */
+        .custom-form {
+            max-width: 600px; /* Adjust based on your design */
+            margin: 20px auto; /* Center the form */
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .custom-form .form-group {
+            margin-bottom: 1rem;
+        }
+        .custom-form label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: black; /* Set label color to black */
+        }
+        .custom-form input, .custom-form select, .custom-form textarea {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .custom-form button[type="submit"] {
+            background-color: #007bff;
+            color: black;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+        .form-errors {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <h2>Edit Product</h2>
+        <form method="post" action="{% url 'edit_product' product.pk %}" enctype="multipart/form-data" class="custom-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.errors %}
+                        <div class="form-errors">
+                            {% for error in field.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {{ field }}
+                </div>
+            {% endfor %}
+            
+            {% for image in existing_images %}
+            <div class="form-group">
+                <img src="{{ image.image.url }}" alt="Product Image" class="img-thumbnail" style="max-width: 150px;"><br>
+                <label for="id_image_{{ image.id }}">Replace Image:</label>
+                <input type="file" name="image_{{ image.id }}" id="id_image_{{ image.id }}" ><br>
+            </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary">Update Product</button>
+        </form>
+    </div>
+    <!-- Bootstrap and any other JavaScript libraries -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Additional scripts as needed -->
+</body>
+</html>
+{% endblock %}

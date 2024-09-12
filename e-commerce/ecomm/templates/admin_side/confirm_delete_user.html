@@ -1,0 +1,25 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row tm-content-row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 tm-block-col">
+            <div class="tm-bg-primary-dark tm-block tm-block-products">
+                <h2>{% if user.is_active %}Inactivate User{% else %}Activate User{% endif %}</h2>
+                <p>{% if user.is_active %}
+                        Are you sure you want to inactivate {{ user.username }}?
+                    {% else %}
+                        Are you sure you want to activate {{ user.username }}?
+                    {% endif %}
+                </p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn {% if user.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                        {% if user.is_active %}Inactivate{% else %}Activate{% endif %}
+                    </button>
+                    <a href="{% url 'user_page:user_list' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

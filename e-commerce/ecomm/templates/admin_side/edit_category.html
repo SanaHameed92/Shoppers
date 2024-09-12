@@ -1,0 +1,11 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Category</h2>
+    <form method="post" action="{% url 'edit_category' category.pk %}" class="custom-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Update Category</button>
+    </form>
+</div>
+{% endblock %}

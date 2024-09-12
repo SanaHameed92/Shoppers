@@ -1,0 +1,64 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row tm-content-row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 tm-block-col">
+            <div class="tm-bg-primary-dark tm-block tm-block-product-categories">
+                <h2 class="tm-block-title">Manage Product Categories</h2>
+                <div class="tm-product-table-container">
+                    <table class="table tm-table-small tm-product-table text-white">
+                        <thead>
+                            <tr>
+                                <th>Category Name</th>
+                                <th>Offer (%)</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                                <th>Subcategories</th> <!-- New column -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in categories %}
+                            <tr>
+                                <td>{{ category.category_name }}</td>
+                                <td>{{ category.category_offer }}%</td>
+                                <td>
+                                    {% if category.is_active %}
+                                        <span class="text-success">Active</span>
+                                    {% else %}
+                                        <span class="text-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'edit_category' category.pk %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'delete_category' category.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <a href="{% url 'manage_subcategories' category.pk %}" class="btn btn-info btn-sm">
+                                        Manage Subcategories
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <form method="post" class="text-center text-white pt-2">
+                        {% csrf_token %}
+                        {{ category_form.as_p }}
+                        <button type="submit" class="btn btn-primary btn-block text-uppercase mb-3">Add new category</button>
+                    </form>
+                </div>
+                <!-- table container -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Sana Brocamp/E-commerce-website/e-commerce/ecomm/db.sqlite3" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="150"/><column_width id="3" width="9119"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,18:mainproducts_orderitem"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="User_address" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="61"/><column index="2" value="163"/><column index="3" value="117"/><column index="4" value="109"/><column index="5" value="127"/><column index="6" value="134"/><column index="7" value="113"/><column index="8" value="122"/><column index="9" value="117"/><column index="10" value="167"/><column index="11" value="88"/><column index="12" value="67"/><column index="13" value="267"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="products_orderitem" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="61"/><column index="2" value="97"/><column index="3" value="99"/><column index="4" value="123"/><column index="5" value="122"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">UPDATE products_orderitem
+SET total_price = quantity * (
+    SELECT original_price * (1 - (
+        CASE 
+            WHEN product_offer &gt;= COALESCE(category.category_offer, 0) AND product_offer &gt;= COALESCE(brand.brand_offer, 0) THEN product_offer
+            WHEN category.category_offer &gt;= COALESCE(brand.brand_offer, 0) THEN category.category_offer
+            ELSE brand.brand_offer
+        END) / 100)
+    FROM products_product 
+    LEFT JOIN products_category AS category ON products_product.category_id = category.id
+    LEFT JOIN products_brand AS brand ON products_product.brand_id = brand.id
+    WHERE products_product.id = products_orderitem.product_id
+)
+WHERE total_price IS NULL;</sql><current_tab id="0"/></tab_sql></sqlb_project>

@@ -1,0 +1,52 @@
+{% extends "base1.html" %}
+{% load static %}
+
+{% block content %}
+<body>
+    <div class="">
+        <section class="vh-100">
+            <div class="container py-5 h-100">
+                <div class="row d-flex p-5 justify-content-center align-items-center h-100">
+                    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+                            <div class="card-body p-5 text-center">
+                                <h3 class="mb-5">Admin Log in</h3>
+                               
+
+                                <form action="{% url 'admin_login' %}" method="POST">
+                                    {% csrf_token %}
+                                    {{ form.non_field_errors }}
+                                    <div class="form-group">
+                                        {{ form.username.label_tag }}
+                                        {{ form.username }}
+                                        {% if form.username.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.username.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.password.label_tag }}
+                                        {{ form.password }}
+                                        {% if form.password.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.password.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <button class="btn btn-primary btn-lg btn-block" type="submit">Admin Login</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+{% endblock %}

@@ -1,0 +1,606 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+    /* Existing styles */
+    .order-detail-container {
+        margin-top: 50px;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .order-detail-content {
+        flex: 1;
+    }
+
+    .order-detail-container h2 {
+        margin-bottom: 30px;
+        color: #343a40;
+    }
+
+    .order-detail-container h3 {
+        color: #007bff;
+        margin-bottom: 15px;
+    }
+
+    .order-detail-container p {
+        font-size: 1.1rem;
+        color: #495057;
+    }
+
+    .order-detail-container h4 {
+        margin-top: 20px;
+        color: #28a745;
+    }
+
+    .order-detail-container .order-items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .order-detail-container .order-items-table th,
+    .order-detail-container .order-items-table td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #dee2e6;
+    }
+
+    .order-detail-container .order-items-table th {
+        background-color: #f8f9fa;
+        color: #343a40;
+    }
+
+    .order-detail-container .order-items-table td {
+        background-color: #ffffff;
+    }
+
+    .order-detail-container .order-items-table .item-name {
+        color: #007bff;
+    }
+
+    .order-detail-container .order-items-table .item-price {
+        color: #ff5722;
+        font-weight: bold;
+    }
+
+    .order-detail-container .order-items-table .item-image img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+    .back-button, .cancel-button, .return-button, .invoice-button, .continue-button {
+        margin-top: 20px;
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: bold;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .back-button {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .back-button:hover {
+        background-color: #0056b3;
+    }
+
+    .cancel-button {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    .cancel-button:hover {
+        background-color: #c82333;
+    }
+
+    .return-button {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .return-button:hover {
+        background-color: #218838;
+    }
+
+    .invoice-button {
+        background-color: #ffc107;
+        color: #fff;
+        border: 1px solid #e0a800;
+    }
+
+    .invoice-button:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+
+    .invoice-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.5);
+    }
+
+    .continue-button {
+        background-color: #17a2b8;
+        color: #fff;
+    }
+
+    .continue-button:hover {
+        background-color: #138496;
+    }
+
+    .status-ordered {
+        color: #007bff;
+    }
+
+    .status-shipped {
+        color: #17a2b8;
+    }
+
+    .status-delivered {
+        color: #28a745;
+    }
+
+    .status-cancelled {
+        color: #dc3545;
+    }
+
+    .status-returned {
+        color: #ffc107;
+    }
+
+    .status-pending {
+        color: #ffc107;
+    }
+
+    .refund-info {
+        width: 250px;
+        padding: 15px;
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+        margin-left: 20px;
+        color: #155724;
+        font-size: 0.9rem;
+        position: relative;
+    }
+
+    .refund-info h4 {
+        margin-top: 0;
+        color: #28a745;
+        font-size: 1rem;
+    }
+
+    .wallet-button {
+        display: block;
+        margin-top: 10px;
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .wallet-button:hover {
+        background-color: #0056b3;
+    }
+
+    .return-status {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 250px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        color: #343a40;
+        font-size: 1rem;
+        margin-top: 20px;
+        margin-right: 20px;
+    }
+
+    .return-status.accepted {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .return-status.rejected {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    /* New styles for payment pending message */
+    .payment-status-container {
+        display: flex;
+        justify-content: ; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        margin: 20px 0; /* Space above and below */
+    }
+    
+    .payment-status {
+        font-size: 1.5rem; /* Adjust font size */
+        font-weight: bold; /* Make the text bold */
+        color: #007bff; /* Blue color for the payment status */
+        padding: 10px 20px; /* Add padding */
+        border: 2px solid #007bff; /* Blue border */
+        border-radius: 5px; /* Rounded corners */
+        background-color: #f0f8ff; /* Light background color */
+    }
+
+    .payment-success-container {
+        margin-top: 10px;
+    }
+
+    .payment-success {
+        color: #28a745; /* Green color */
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .order-detail-actions {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }.cancellation-status {
+        width: 250px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        color: #343a40;
+        font-size: 1rem;
+        position: absolute;
+        top: 100px;
+        right: 20px;
+    }
+
+    .cancellation-status.accepted {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .cancellation-status.rejected {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+    .hidden {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+.coupon-info {
+    margin-top: 20px;
+    padding: 15px;
+   
+    color: #495057;
+    font-size: 1rem;
+}
+
+.coupon-info h4 {
+    margin-top: 0;
+    color: #007bff;
+    font-size: 1.1rem;
+}
+
+.coupon-info p {
+    margin: 5px 0;
+
+}
+.continue-payment-label {
+    display: block; /* Ensure the span is on its own line */
+    margin-top: 15px; /* Space above the text */
+    margin-bottom: 20px; /* Space below the text */
+    font-size: 25px; /* Adjust font size as needed */
+    font-weight: bold; /* Make the text bold */
+    color: #333; /* Dark color for the text */
+    text-align: center; /* Center the text */
+}
+.shipping-address-container {
+    margin-right: 0; /* Optional: remove right margin if needed */
+    padding: 10px; /* Optional: add padding around the address */
+    background-color:#e5eaf5; /* Optional: background color for better visibility */
+    border: 1px solid #ddd; /* Optional: border for better separation */
+    border-radius: 5px; /* Optional: rounded corners */
+    max-width: 100%; /* Ensure the width is responsive */
+}
+
+.text-md-right {
+    text-align: right; /* Align the text to the right on medium and larger screens */
+}
+
+
+
+</style>
+
+<div class="container order-detail-container">
+    <div class="order-detail-content">
+        <div class="order-detail-actions">
+            {% if order.status == 'Delivered' %}
+                <a href="{% url 'generate_invoice' order_number=order.order_number %}" class="invoice-button">Download Invoice</a>
+            {% elif order.status == 'Cancelled' %}
+                <div class="cancellation-status accepted">
+                    <h4>Order Cancelled</h4>
+                    <p>Your order was cancelled. The refund has been processed to your wallet.</p>
+                </div>
+            {% elif order.payment_method == 'COD' and order.status == 'Ordered' %}
+                {% if order.payment_status == 'Completed' %}
+                    <div class="payment-success-container">
+                        <span class="payment-success">Payment Successful!</span>
+                        <a href="{% url 'generate_invoice' order_number=order.order_number %}" class="invoice-button">Download Invoice</a>
+                    </div>
+                {% elif order.payment_status == 'Pending' %}
+                    <span class="continue-payment-label">Continue Payment with</span>
+                    <a href="#" id="continue-payment-btn" class="continue-button">Razorpay</a>
+                    <a href="#" id="wallet-payment-btn" class="wallet-button">Wallet</a>
+                    <div class="payment-status-container">
+                        <span class="payment-status">{{ order.payment_status }}</span>
+                    </div>
+                {% endif %}
+            {% elif order.payment_method == 'RazorPay' %}
+                {% if order.status == 'Pending' %}
+                    <span class="continue-payment-label">Continue Payment with</span>
+                    <a href="#" id="continue-payment-btn" class="continue-button">Razorpay</a>
+                    <a href="#" id="wallet-payment-btn" class="wallet-button">Wallet</a>
+                    <div class="payment-status-container">
+                        <span class="payment-status">{{ order.payment_status }}</span>
+                    </div>
+                {% elif order.status == 'Ordered' %}
+                    <div class="payment-success-container">
+                        <span class="payment-success">Payment Successful!</span>
+                        <a href="{% url 'generate_invoice' order_number=order.order_number %}" class="invoice-button">Download Invoice</a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        
+
+        <h2>Order Details</h2>
+        <h3>Order Number: {{ order.order_number }}</h3>
+        <p>Date: {{ order.created_at|date:"Y-m-d H:i" }}</p>
+        <p class="{% if order.status == 'Ordered' %}status-ordered{% elif order.status == 'Shipped' %}status-shipped{% elif order.status == 'Delivered' %}status-delivered{% elif order.status == 'Cancelled' %}status-cancelled{% elif order.status == 'Returned' %}status-returned{% elif order.status == 'Pending' %}status-pending{% endif %}">
+            Status: {{ order.status }}
+        </p>
+        
+        <p>Total: Rs{{ order.grand_total|floatformat:2 }}</p>
+        <p>Payment Method: {{ order.payment_method }}</p>
+        <div class="payment-status-container">
+            <p>Payment Status : </p>
+            <p class="payment-status">{{ order.payment_status }}</p>
+        </div>
+
+        <div class="row">
+            <!-- Shipping Address Details -->
+            <div class="col-md-6 shipping-address-container">
+                <h4>Shipping Address:</h4>
+                <p>Name: {{ order.address.first_name }} {{ order.address.last_name }}</p>
+                <p>Address: {{ order.address.street_address }}, {{ order.address.city }}, {{ order.address.state }}, {{ order.address.country }} - {{ order.address.postal_code }}</p>
+                <p>Phone: {{ order.address.phone_number }}</p>
+            </div>
+        
+            <!-- Coupon Information -->
+            <div class="col-md-6 text-md-right">
+                {% if order.coupon %}
+                <div class="coupon-info">
+                    <h4>Applied Coupon:</h4>
+                    <p><strong>Coupon Code:</strong> {{ order.coupon.code }}</p>
+                    <p><strong>Discount:</strong> {{ order.coupon.discount|floatformat:2 }}%</p>
+                    <p><strong>Amount Saved:</strong> Rs{{ amount_saved|floatformat:2 }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+
+
+
+
+        <h4>Items:</h4>
+        <table class="order-items-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td class="item-image">
+                        <img src="{{ item.product.product_image.url }}" alt="{{ item.product.title }}">
+                    </td>
+                    <td class="item-name">
+                        <a href="{% url 'product_page:shop-single' item.product.id %}">{{ item.product.title }}</a>
+                    </td>
+                    <td>{{ item.quantity }}</td>
+                    <td class="item-price">Rs{{ item.total_price|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Display messages with the custom tag -->
+        {% for message in messages %}
+            {% if message.tags == 'order_detail' %}
+                <div class="message-box {% if message.level == 20 %}message-success{% else %}message-error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <a href="{% url 'my_orders' %}" class="back-button">Back to My Orders</a>
+        
+{% if order.status != 'Cancelled' and order.status != 'Delivered' and order.status != 'Pending' and not order.return_request %}
+    {% if order.payment_method != 'COD' or order.payment_status != 'Pending' %}
+        <a href="#" id="cancel-order-btn" class="cancel-button">Request Cancellation</a>
+        <form action="{% url 'request_cancel_order' order_number=order.order_number %}" method="post" id="cancel-order-form" class="hidden p-2">
+            {% csrf_token %}
+            <textarea id="reason-textarea" name="reason" rows="4" placeholder="Enter reason for cancellation..." required></textarea>
+            <button type="submit" class="btn btn-danger">Submit Cancellation</button>
+        </form>
+
+    {% endif %}
+
+
+{% endif %}
+
+
+
+    </div>
+
+    <!-- Display refund information -->
+    {% if order.status == 'Cancelled' %}
+    <div class="refund-info">
+        <h4>Refund Information:</h4>
+        <a href="{% url 'my_wallet' %}" class="wallet-button">View Wallet</a>
+    </div>
+    {% endif %}
+
+    <!-- Display return request status and wallet button if confirmed -->
+    {% if order.return_request %}
+    <div class="return-status {% if order.return_request.status == 'Confirmed' %}accepted{% else %}rejected{% endif %}">
+        <h4>Return Request Status:</h4>
+        <p>Status: {{ order.return_request.status }}</p>
+        <p>Reason: {{ order.return_request.reason }}</p>
+        <a href="{% url 'my_wallet' %}" class="wallet-button">View Wallet</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var continuePaymentButton = document.getElementById('continue-payment-btn');
+        var cancelOrderButton = document.getElementById('cancel-order-btn');
+        var cancelOrderForm = document.getElementById('cancel-order-form');
+        var returnRequestButton = document.getElementById('request-return-btn');
+        var returnRequestForm = document.getElementById('return-request-form');
+
+        if (continuePaymentButton) {
+            continuePaymentButton.addEventListener('click', function(e) {
+                e.preventDefault();
+    
+                // Display confirmation dialog
+                var userConfirmed = confirm("Are you sure you want to proceed with Razorpay payment?");
+    
+                if (userConfirmed) {
+                    var options = {
+                        "key": "rzp_test_Yl6grfBbwpSDvh", 
+                        "amount": {{ order.grand_total|floatformat:2 }} * 100, // Amount in paise
+                        "currency": "INR",
+                        "name": "Your Company Name",
+                        "description": "Order Payment",
+                        "order_id": "{{ order.razorpay_order_id }}", // Razorpay Order ID
+                        "handler": function (response) {
+                            // Handle payment success
+                            window.location.href = "{% url 'product_page:order_success_after_failure' order_number=order.order_number %}?payment_id=" + response.razorpay_payment_id;
+                        },
+                        "prefill": {
+                            "name": "{{ order.address.first_name }} {{ order.address.last_name }}",
+                            "email": "{{ user.email }}",
+                            "contact": "{{ order.address.phone_number }}"
+                        },
+                        "theme": {
+                            "color": "#3399cc"
+                        }
+                    };
+    
+                    var rzp = new Razorpay(options);
+                    rzp.open();
+                }
+            });
+        }
+
+        // Show/hide cancellation reason textarea
+        if (cancelOrderButton && cancelOrderForm) {
+            cancelOrderButton.addEventListener('click', function() {
+                if (cancelOrderForm.classList.contains('hidden')) {
+                    cancelOrderForm.classList.remove('hidden');
+                    cancelOrderForm.classList.add('show');
+                    cancelOrderButton.textContent = 'Cancel Request';
+                } else {
+                    cancelOrderForm.classList.remove('show');
+                    cancelOrderForm.classList.add('hidden');
+                    cancelOrderButton.textContent = 'Request Cancellation';
+                }
+            });
+        }
+
+        // Show/hide return request form
+        if (returnRequestButton && returnRequestForm) {
+            returnRequestButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (returnRequestForm.classList.contains('hidden')) {
+                    returnRequestForm.classList.remove('hidden');
+                    returnRequestForm.classList.add('show');
+                    returnRequestButton.textContent = 'Cancel Return Request';
+                } else {
+                    returnRequestForm.classList.remove('show');
+                    returnRequestForm.classList.add('hidden');
+                    returnRequestButton.textContent = 'Request Return';
+                }
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var walletPaymentButton = document.getElementById('wallet-payment-btn');
+    
+        if (walletPaymentButton) {
+            walletPaymentButton.addEventListener('click', function(e) {
+                e.preventDefault();
+    
+                // Display the confirmation dialog
+                var userConfirmed = confirm("Are you proceeding to pay with wallet?");
+                
+                if (userConfirmed) {
+                    // Send AJAX request to wallet_payment view
+                    fetch('{% url "wallet_payment" order_number=order.order_number %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            window.location.href = "{% url 'product_page:order_success_after_failure' order_number=order.order_number %}";
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+        }
+    });
+    
+    
+</script>
+
+
+
+{% endblock %}

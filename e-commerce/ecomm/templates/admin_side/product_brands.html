@@ -1,0 +1,61 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+    <div class="row tm-content-row">
+        <div class="col-12 tm-block-col">
+            <div class="tm-bg-primary-dark tm-block tm-block-product-brands">
+                <h2 class="tm-block-title text-center">Manage Product Brands</h2>
+                <div class="tm-product-table-container">
+                    <table class="table tm-table-small tm-product-table text-white">
+                        <thead>
+                            <tr>
+                                <th>Brand Name</th>
+                                <th>Offer (%)</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for brand in brands %}
+                            <tr>
+                                <td>{{ brand.brand_name }}</td>
+                                <td>{{ brand.brand_offer }}%</td>
+                                <td>
+                                    {% if brand.is_active %}
+                                        <span class="text-success">Active</span>
+                                    {% else %}
+                                        <span class="text-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'edit_brand' brand.pk %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'toggle_brand_status' brand.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Table container ends here -->
+                <div class="text-center mt-4">
+                    <form method="post" class="text-white">
+                        {% csrf_token %}
+                        {{ brand_form.as_p }}
+                        <button type="submit" class="btn btn-primary btn-block text-uppercase mb-3">Add new brand</button>
+                    </form>
+                </div>
+                <!-- Form container ends here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row tm-content-row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 tm-block-col">
+            <div class="tm-bg-primary-dark tm-block">
+                <h2 class="tm-block-title">Edit Subcategory</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

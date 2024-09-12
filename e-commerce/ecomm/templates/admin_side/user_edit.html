@@ -1,0 +1,19 @@
+<!-- admin_side/user_edit.html -->
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row tm-content-row">
+        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col mx-auto">
+            <div class="tm-bg-primary-dark tm-block tm-block-products">
+                <h2 class="tm-block-title mb-4">Edit User</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary btn-block text-uppercase mt-4">Save Changes</button>
+                    <a href="{% url 'user_page:user_list' %}" class="btn btn-secondary btn-block text-uppercase mt-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

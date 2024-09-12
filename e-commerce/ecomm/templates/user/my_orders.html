@@ -1,0 +1,94 @@
+{% extends "user_base.html" %}
+{% load static %}
+
+{% block user_content %}
+
+<form method="GET" action="{% url 'my_orders' %}">
+    <div class="input-group mb-3">
+        <input type="text" name="search" class="form-control" placeholder="Search Orders" value="{{ request.GET.search }}">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">Search</button>
+        </div>
+    </div>
+</form>
+
+<h2>My Orders</h2>
+
+<div class="mb-4">
+    <a href="{% url 'profile' %}" class="btn btn-secondary btn-lg">Back to Profile</a>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% if orders %}
+            <table class="table orders-table">
+                <thead>
+                    <tr>
+                        <th>Order Number</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Payment Status</th>  
+                        <th>Coupon</th>
+                        <th>Total</th>
+                        <th>Payment Method</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.order_number }}</td>
+                        <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            {% if order.status == 'Ordered' %}
+                                <span class="status-ordered">{{ order.status }}</span>
+                            {% elif order.status == 'Completed' %}
+                                <span class="status-completed">{{ order.status }}</span>
+                            {% elif order.status == 'Cancelled' %}
+                                <span class="status-cancelled">{{ order.status }}</span>
+                            {% else %}
+                                {{ order.status }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if order.payment_status == 'Pending' %}
+                                <span class="payment-status-pending">{{ order.payment_status }}</span>
+                            {% elif order.payment_status == 'Completed' %}
+                                <span class="payment-status-completed">{{ order.payment_status }}</span>
+                            {% elif order.payment_status == 'Failed' %}
+                                <span class="payment-status-failed">{{ order.payment_status }}</span>
+                            {% elif order.payment_status == 'Refunded' %}
+                                <span class="payment-status-refunded">{{ order.payment_status }}</span>
+                            {% else %}
+                                {{ order.payment_status }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if order.coupon %}
+                                <span class="coupon-applied">Coupon: {{ order.coupon.code }}</span>
+                            {% else %}
+                                <span class="no-coupon">No Coupon Applied</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td class="total-amount">${{ order.grand_total|floatformat:2 }}</td>
+                        <td>{{ order.payment_method }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center;">
+                                <a href="{% url 'order_detail' order_number=order.order_number %}" class="btn btn-primary btn-sm" style="margin-right: 5px;">View Details</a>
+                                <form action="{% url 'delete_order' order_number=order.order_number %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-times"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-orders">You have no orders.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

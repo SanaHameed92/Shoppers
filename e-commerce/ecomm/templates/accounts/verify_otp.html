@@ -1,0 +1,37 @@
+{% extends "base1.html" %}
+{% load static %}
+
+{% block content %}
+<section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-2-strong" style="border-radius: 15px;">
+                    <div class="card-body p-5">
+                        <h3 class="mb-5">Verify OTP</h3>
+                        
+                        <!-- Display messages tagged as 'otp' -->
+                        {% if messages %}
+                            <div class="alert alert-info">
+                                {% for message in messages %}
+                                    {% if 'otp' in message.tags %}
+                                        <div class="alert alert-{{ message.tags }} mt-2">
+                                            {{ message }}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <form method="post" action="{% url 'verify_otp' user.id scenario %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-primary btn-lg btn-block mt-4">Verify OTP</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
