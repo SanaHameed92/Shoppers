@@ -1,2 +1,3 @@
 e-commerce/ecomm/.env
 *.pyc
+db.sqlite3
