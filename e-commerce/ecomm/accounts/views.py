@@ -391,11 +391,13 @@ def add_product(request):
             # Handle main product image
             main_image = request.FILES.get('product_image')
             if main_image:
+                print(f"Main image: {main_image.name}")
                 ProductImage.objects.create(product=product, image=main_image, is_main=True)
 
             # Handle additional images
             additional_images = request.FILES.getlist('additional_images')
             for image in additional_images:
+                print(f"Additional image: {image.name}")
                 ProductImage.objects.create(product=product, image=image, is_main=False)
 
             messages.success(request, 'Product added successfully.')
